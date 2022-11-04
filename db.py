@@ -29,38 +29,74 @@ class Topic:
     def __str__(self) -> str:
         return str(self.id) + ': ' + str(self.name)
 
-def get_techs() -> list:
-    conn = sqlite3.connect(db)
+class Code:
+    descript = ''
+    block = ''
+    type = ''
 
-    cur = conn.cursor()
-    cur.execute("""
-                    select id, name
-                      from tech
-                      order by name;
-                """)
-    results = cur.fetchall()
-    conn.close()
+    def __init__(self, t: tuple):
+        self.descript = t[0]
+        self.block = t[1]
+        self.type = t[2]
+
+def get_techs() -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id, name
+                        from tech
+                        order by name;
+                    """)
+        results = cur.fetchall()
 
     return [Tech(results[i]) for i in range(len(results))]
 
-def get_topics(id_tech: int) -> list:
-    conn = sqlite3.connect(db)
+def get_tech(token: str) -> int:
+    """
+        Get tech by token
+    """
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id
+                        from tech
+                        where name like '%{token}%'
+                        order by name;
+                    """.format(token=token))
+    result = cur.fetchone()
+    if result is None:
+        return None
+    else:        
+        return int(result[0])
 
-    cur = conn.cursor()
-    cur.execute("""
-                    select id, 
-                           id_tech, 
-                           name,
-                           url
-                      from topic
-                      where id_tech = {id_tech}
-                      order by name;
-                """.format(id_tech = id_tech))
-    results = cur.fetchall()
-    conn.close()
+def get_topics(id_tech: int) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id, 
+                            id_tech, 
+                            name,
+                            url
+                        from topic
+                        where id_tech = {id_tech}
+                        order by name;
+                    """.format(id_tech = id_tech))
+        results = cur.fetchall()
 
     return [Topic(results[i]) for i in range(len(results))]
 
+def get_codes(id_topic: int) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT descript, 
+                              block, 
+                              type
+                FROM code 
+                where id_topic = {id_topic}
+                order by seq_num asc;""".format(id_topic=id_topic))
+        results = cur.fetchall()
+
+    return [Code(results[i]) for i in range(len(results))]
+
 if __name__ == "__main__":
-    l_topics = get_topics(1)
-    print(l_topics)
+    print(get_tech('out'))
