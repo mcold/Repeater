@@ -39,6 +39,26 @@ class Code:
         self.block = t[1]
         self.type = t[2]
 
+class Item:
+    id = 0
+    lang = ''
+    name = ''
+    url = ''
+
+    def __init__(self, t: tuple):
+        self.id = t[0]
+        self.lang = t[1]
+        self.name = t[2]
+        self.url = t[3]
+
+class Sentence:
+    eng = ''
+    ru = ''
+
+    def __init__(self, t: tuple):
+        self.eng = t[0]
+        self.ru = t[1]
+
 def get_techs() -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
@@ -47,9 +67,8 @@ def get_techs() -> list:
                         from tech
                         order by name;
                     """)
-        results = cur.fetchall()
 
-    return [Tech(results[i]) for i in range(len(results))]
+    return [Tech(result) for result in cur.fetchall()]
 
 def get_tech(token: str) -> int:
     """
@@ -81,9 +100,8 @@ def get_topics(id_tech: int) -> list:
                         where id_tech = {id_tech}
                         order by name;
                     """.format(id_tech = id_tech))
-        results = cur.fetchall()
 
-    return [Topic(results[i]) for i in range(len(results))]
+    return [Topic(result) for result in cur.fetchall()]
 
 def get_codes(id_topic: int) -> list:
     with sqlite3.connect(db) as conn:
@@ -94,9 +112,35 @@ def get_codes(id_topic: int) -> list:
                 FROM code 
                 where id_topic = {id_topic}
                 order by seq_num asc;""".format(id_topic=id_topic))
-        results = cur.fetchall()
+    
+    return [Code(result) for result in cur.fetchall()]
 
-    return [Code(results[i]) for i in range(len(results))]
+def get_sentences(id_item: int) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT 
+                    eng,
+                    ru 
+                    FROM sentence 
+                    where id_item = {id_item}
+                    order by seq_num asc;""".format(id_item=id_item))
+
+    return [Sentence(result) for result in cur.fetchall()]
+
+def get_items(lang: str) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id,
+                            lang,
+                            name,
+                            url
+                        from item
+                        where lang = '{lang}'
+                        order by id desc;
+                    """.format(lang = lang))
+
+    return [Item(result) for result in cur.fetchall()]
 
 if __name__ == "__main__":
     print(get_tech('out'))

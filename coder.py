@@ -7,18 +7,20 @@ from db import get_techs, get_tech, get_topics, get_codes
 
 
 clear = lambda: os.system('cls')
+cross_line = lambda: print('\n' + '-'*25 + '\n')
+empty_line = lambda: input('\n')
 
-def print_codes(id_topic: int):
+def code_loop(id_topic: int):
     l_codes = get_codes(id_topic=id_topic)
     console = Console()
 
     for i in range(len(l_codes)):
         code = l_codes[i]
-        print('\n' + str(i + 1) + ' ' + code.descript)
-        _ = input('\n')
-        synt = Syntax(code.block, code.type)
-        console.print(synt)
-        _ = input('\n')
+        # print('\n')
+        console.print(Syntax('\n' + str(i + 1) + ' ' + code.descript, code.type))
+        empty_line()
+        console.print(Syntax(code.block, code.type))
+        empty_line()
 
 def choose_tech():
     l_techs = get_techs()
@@ -31,7 +33,7 @@ def choose_tech():
         clear()
         for i in range(len(l_techs)):
             print(str(i+1) + ' ' + l_techs[i].name)
-        print('\n------------------------\n')
+        cross_line()
         x = input('Enter number of tech (or type exit): ')
         if x.lower() in ('exit', 'quit'):
             sys.exit()
@@ -55,7 +57,7 @@ def choose_topic(id_tech: int):
         clear()
         for i in range(len(l_topics)):
             print(str(i+1) + ' ' + l_topics[i].name)
-        print('\n------------------------\n')
+        cross_line()
         x = input('Enter number of topic (or type exit): ')
         if x.lower() in ('exit', 'quit'):
             sys.exit()
@@ -70,7 +72,7 @@ def choose_topic(id_tech: int):
 def topic_loop(id_tech: int):
     while True:
         id_topic = choose_topic(id_tech)
-        print_codes(id_topic=id_topic)
+        code_loop(id_topic=id_topic)
         clear()
 
 if __name__ == "__main__":

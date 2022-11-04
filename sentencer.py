@@ -1,25 +1,90 @@
 # coding: utf-8
-import sqlite3
+import os
+import sys
+from db import get_items, get_sentences, Sentence
 
-conn = sqlite3.connect('DB.db')
+clear = lambda: os.system('cls')
+cross_line = lambda: print('\n' + '-'*25 + '\n')
+num_words = 3
 
-cur = conn.cursor()
+def get_equal_parts_plus_word(phrase: str, attempt: str) -> str:
+    res = ''
+    result = ''
+    for char in phrase.lower():
+        for char_at in attempt[len(res):].lower():
+            if char == char_at:
+                res = res + char
+                break
+            else:
+                res = phrase[:len(res)]
+                addition = ' '.join(phrase[len(res):].split()[0:num_words])
+                if phrase[len(result)+1] == ' ':
+                    res = res + ' ' + addition + ' '
+                else:
+                    res = res + addition + ' '
+                return res
+    return res
 
-# cur.execute("SELECT * FROM users;")one_result = cur.fetchone()
-cur.execute("SELECT row_number() over (partition by id_item order by seq_num asc), ru, eng FROM sentence where id_item = 1 order by seq_num asc;")
-results = cur.fetchall()
+def phrase_loop(num: int, sent: Sentence):
+    res = ''
+    while True:
+        clear()
+        print('\n' + str(num) + ' ' + sent.ru)
+        print('\n')
+        if res == '':
+            x = input()
+        else:
+            x = res + ' ' + input(res + ' ')
+        if x.lower() != sent.eng.lower(): 
+            res = get_equal_parts_plus_word(phrase=sent.eng, attempt=x)
+        else:
+            break
 
-for i in range(len(results)):
-    print('\n' + str(results[i][0]) + ' ' + results[i][1])
-    x = input()
-    eng = results[i][2]
-    if x != eng:
-        # сравниваем фразы
-        # выводим начальную совпадающую часть + 1 следующее слово
-        # повторяем до тех пор пока фразы не совпадут / не будет передано действие
-        pass
-    
-    print('\n' + results[i][2])
-    x = input()
+def sentence_loop(id_item: int):
+    l_sents = get_sentences(id_item=id_item)
+    n = 0
+    for sent in l_sents:
+        n = n + 1
+        phrase_loop(num=n, sent=sent)
 
-conn.close()    
+def choose_item(lang: str):
+    l_items = get_items(lang)
+    d_num = dict()
+
+    for i in range(len(l_items)):
+        item = l_items[i]
+        d_num[i+1] = item.id
+        
+    while True:
+        clear()
+        for i in range(len(l_items)):
+            print(str(i+1) + ' ' + l_items[i].name)
+        cross_line()
+        x = input('Enter number of item (or type exit): ')
+        if x.lower() in ('exit', 'quit'):
+            sys.exit()
+        else:
+            try:
+                return d_num[int(x)]
+            except KeyError:
+                continue
+            except ValueError:
+                continue
+
+def item_loop(lang: str):
+    while True:
+        sentence_loop(id_item=choose_item(lang))
+        clear()
+
+if __name__ == "__main__":
+    item_loop(lang='eng')
+    # item_loop(lang='eng')
+    # print(get_equal_parts(phrase='sOMe ideal other maybe', attempt='Some iDeal ather maybe'))
+    # if len(sys.argv) > 1:
+    #     id_tech = get_tech(sys.argv[1])
+    #     if id_tech is not None:
+    #         topic_loop(id_tech = id_tech)
+    #     else:
+    #         topic_loop(choose_tech())  
+    # else:
+    #   topic_loop(choose_tech())
