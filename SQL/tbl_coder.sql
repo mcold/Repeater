@@ -11,4 +11,6 @@ create table if not exists code(id 			integer primary key autoincrement,
 								seq_num		integer,
 								block		blob,
 								descript	text,
-								type		text);
+								type		text,
+								output		text,
+								url_pict	text);
