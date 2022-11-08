@@ -2,23 +2,22 @@
 import os
 import sys
 from rich.console import Console
-from rich.syntax import Syntax
 from rich.markdown import Markdown
 from db import get_techs, get_tech, get_topics, get_codes
+from db import Tech, Topic
 
-title = ''
-print_title = lambda: print(title + '\n' + '-'*len(title) + '\n')
 clear = lambda: os.system('cls')
 cross_line = lambda: print('\n' + '-'*25 + '\n')
 empty_line = lambda: input('\n')
 
-def code_loop(id_topic: int):
-    l_codes = get_codes(id_topic=id_topic)
+def code_loop(topic: Topic):
+    l_codes = get_codes(topic=topic)
     console = Console()
 
     clear()
-    print_title()
-
+    print(topic)
+    empty_line()
+    
     for i in range(len(l_codes)):
         code = l_codes[i]
         
@@ -33,7 +32,7 @@ def code_loop(id_topic: int):
         empty_line()
         
 
-def choose_tech():
+def choose_tech() -> Tech:
     l_techs = get_techs()
     d_num = dict()
     for i in range(len(l_techs)):
@@ -50,15 +49,14 @@ def choose_tech():
             sys.exit()
         else:
             try:
-                return d_num[int(x)]
+                return l_techs[int(x)-1]
             except KeyError:
                 continue
             except ValueError:
                 continue
 
-def choose_topic(id_tech: int):
-    global title
-    l_topics = get_topics(id_tech=id_tech)
+def choose_topic(tech: Tech) -> Topic:
+    l_topics = get_topics(tech=tech)
     d_num = dict()
 
     for i in range(len(l_topics)):
@@ -75,25 +73,23 @@ def choose_topic(id_tech: int):
             sys.exit()
         else:
             try:
-                title = l_topics[int(x)-1].name
-                return d_num[int(x)]
+                return l_topics[int(x)-1]
             except KeyError:
                 continue
             except ValueError:
                 continue
 
-def topic_loop(id_tech: int):
+def topic_loop(tech: Tech):
     while True:
-        id_topic = choose_topic(id_tech)
-        code_loop(id_topic=id_topic)
+        topic = choose_topic(tech)
+        code_loop(topic=topic)
         clear()
-        print_title()
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        id_tech = get_tech(sys.argv[1])
-        if id_tech is not None:
-            topic_loop(id_tech = id_tech)
+        tech = get_tech(sys.argv[1])
+        if tech is not None:
+            topic_loop(tech = tech)
         else:
             topic_loop(choose_tech())
     else:

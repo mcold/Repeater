@@ -27,7 +27,7 @@ class Topic:
         self.url = t[3]
 
     def __str__(self) -> str:
-        return str(self.name) + '\n' + self.url
+        return str(self.name) + '\n' + (self.url if self.url != None else '')
 
 class Code:
     descript = ''
@@ -79,7 +79,7 @@ def get_tech(token: str) -> int:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
-                        select id
+                        select id, name
                         from tech
                         where name like '%{token}%'
                         order by name;
@@ -88,9 +88,9 @@ def get_tech(token: str) -> int:
     if result is None:
         return None
     else:        
-        return int(result[0])
+        return Tech(result)
 
-def get_topics(id_tech: int) -> list:
+def get_topics(tech: Tech) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
@@ -101,11 +101,11 @@ def get_topics(id_tech: int) -> list:
                         from topic
                         where id_tech = {id_tech}
                         order by name;
-                    """.format(id_tech = id_tech))
+                    """.format(id_tech = tech.id))
 
     return [Topic(result) for result in cur.fetchall()]
 
-def get_codes(id_topic: int) -> list:
+def get_codes(topic: Topic) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""SELECT descript, 
@@ -114,7 +114,7 @@ def get_codes(id_topic: int) -> list:
                               url_pict
                 FROM code 
                 where id_topic = {id_topic}
-                order by seq_num asc;""".format(id_topic=id_topic))
+                order by seq_num asc;""".format(id_topic=topic.id))
     
     return [Code(result) for result in cur.fetchall()]
 
