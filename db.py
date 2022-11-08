@@ -32,16 +32,14 @@ class Topic:
 class Code:
     descript = ''
     block = ''
-    type = ''
     output = ''
     url_pict = ''
 
     def __init__(self, t: tuple):
         self.descript = t[0]
         self.block = t[1]
-        self.type = t[2]
-        self.output = t[3]
-        self.url_pict = t[4]
+        self.output = t[2]
+        self.url_pict = t[3]
 
 class Item:
     id = 0
@@ -111,8 +109,7 @@ def get_codes(id_topic: int) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""SELECT descript, 
-                              block, 
-                              type,
+                              block,
                               output,
                               url_pict
                 FROM code 

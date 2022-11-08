@@ -3,6 +3,7 @@ import os
 import sys
 from rich.console import Console
 from rich.syntax import Syntax
+from rich.markdown import Markdown
 from db import get_techs, get_tech, get_topics, get_codes
 
 title = ''
@@ -21,11 +22,11 @@ def code_loop(id_topic: int):
     for i in range(len(l_codes)):
         code = l_codes[i]
         
-        print('\n' + str(i + 1) + ' ' + code.descript)
+        console.print(Markdown('\n' + str(i + 1) + ' ' + code.descript))
         if code.url_pict != None:
             print(str(code.url_pict))
         empty_line()
-        console.print(Syntax(code.block, code.type))
+        console.print(Markdown(code.block))
         if code.output != None:
             empty_line()
             print('\n' + code.output)
@@ -45,7 +46,7 @@ def choose_tech():
             print(str(i+1) + ' ' + l_techs[i].name)
         cross_line()
         x = input('Enter number of tech (or type exit): ')
-        if x.lower() in ('exit', 'quit'):
+        if x.lower() in ('exit', 'quit') or x.lower().startswith('q') or x.lower().startswith('e'):
             sys.exit()
         else:
             try:
@@ -70,7 +71,7 @@ def choose_topic(id_tech: int):
             print(str(i+1) + ' ' + l_topics[i].name)
         cross_line()
         x = input('Enter number of topic (or type exit): ')
-        if x.lower() in ('exit', 'quit'):
+        if x.lower() in ('exit', 'quit') or x.lower().startswith('q') or x.lower().startswith('e'):
             sys.exit()
         else:
             try:
