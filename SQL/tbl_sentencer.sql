@@ -5,6 +5,7 @@ create table if not exists item(id 		integer primary key autoincrement,
 									
 create table if not exists sentence(id 		integer primary key autoincrement,
 									id_item integer,
+									id_word integer references word(id_word),
 									seq_num integer,
-									eng 	text,
+									original 	text,
 									ru 	text);

@@ -17,7 +17,7 @@ def code_loop(topic: Topic):
     clear()
     print(topic)
     empty_line()
-    
+
     for i in range(len(l_codes)):
         code = l_codes[i]
         
@@ -81,7 +81,7 @@ def choose_topic(tech: Tech) -> Topic:
 
 def topic_loop(tech: Tech):
     while True:
-        topic = choose_topic(tech)
+        topic = choose_topic(tech=tech)
         code_loop(topic=topic)
         clear()
 
