@@ -24,13 +24,12 @@ def code_loop(topic: Topic):
         console.print(Markdown('\n' + str(i + 1) + ' ' + code.descript))
         if code.url_pict != None:
             print(str(code.url_pict))
-        empty_line()
+        while input('\n') != '': continue
         console.print(Markdown(code.block))
         if code.output != None:
-            empty_line()
+            while input('\n') != '': continue
             print('\n' + code.output)
         empty_line()
-        
 
 def choose_tech() -> Tech:
     l_techs = get_techs()
