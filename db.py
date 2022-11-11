@@ -19,15 +19,36 @@ class Topic:
     id_tech = 0
     name = ''
     url = ''
+    id_parent = 0
 
     def __init__(self, t: tuple):
         self.id = t[0]
         self.id_tech = t[1]
         self.name = t[2]
         self.url = t[3]
+        self.id_parent = t[4]
 
     def __str__(self) -> str:
         return str(self.name) + '\n' + (self.url if self.url != None else '')
+
+class Leaf:
+    id = 0
+    id_tech = 0
+    name = ''
+    url = ''
+    id_parent = 0
+    level = 0
+
+    def __init__(self, t: tuple):
+        self.id = t[0]
+        self.id_tech = t[1]
+        self.name = t[2]
+        self.url = t[3]
+        self.id_parent = t[4]
+        self.level = t[5]
+
+    def __str__(self) -> str:
+        return ' '* 3 * self.level + str(self.name) + '\n'# (self.url if self.url != None else '')
 
 class Code:
     descript = ''
@@ -124,11 +145,76 @@ def get_topics(tech: Tech) -> list:
                         select id, 
                             id_tech, 
                             name,
-                            url
+                            url,
+                            id_parent
                         from topic
                         where id_tech = {id_tech}
+                          and id_parent is null
                         order by name;
                     """.format(id_tech = tech.id))
+
+    return [Topic(result) for result in cur.fetchall()]
+
+def get_topic_leafs(topic: Topic) -> list:
+    """
+        Leaf = Topic + level
+    """
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        with recursive t(id, id_tech, name, url, id_parent, level) as
+                        (
+                                select id, id_tech, name, url, id_parent, 1
+                                  from topic
+                                 where id = {id_topic_root}
+                                union all
+                                select topic.id, topic.id_tech, topic.name, topic.url, topic.id_parent, t.level + 1
+                                  from topic, t
+                                 where topic.id_parent = t.id
+                            )
+                            select * 
+                              from t
+                             order by level asc;
+                    """.format(id_topic_root = topic.id))
+
+    return [Leaf(result) for result in cur.fetchall()]
+
+def get_topic_roots(topic: Topic) -> list:
+    """
+        Leaf = Topic + level
+    """
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        with recursive t(id, id_tech, name, url, id_parent, level) as
+                        (
+                            select id, id_tech, name, url, id_parent, 1
+                                from topic
+                                where id = {id_topic_leaf}
+                            union all
+                            select topic.id, topic.id_tech, topic.name, topic.url, topic.id_parent, t.level + 1
+                            from topic, t
+                            where topic.id = t.id_parent
+                            ), max_len as (select max(level) max_level from t)
+                            select t.id, t.id_tech, t.name, t.url, t.id_parent, ml.max_level - t.level
+                              from t, max_len ml
+                             order by level desc;
+                    """.format(id_topic_leaf = topic.id))
+    return [Leaf(result) for result in cur.fetchall()]
+
+def get_topic_childs(topic: Topic) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id, 
+                            id_tech, 
+                            name,
+                            url,
+                            id_parent
+                        from topic
+                        where id_parent = {id_topic}
+                        order by name;
+                    """.format(id_topic = topic.id))
 
     return [Topic(result) for result in cur.fetchall()]
 

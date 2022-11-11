@@ -3,25 +3,25 @@ import os
 import sys
 from rich.console import Console
 from rich.markdown import Markdown
-from db import get_techs, get_tech, get_topics, get_codes
+from db import get_techs, get_tech, get_topics, get_topic_childs, get_topic_leafs, get_topic_roots, get_codes
 from db import Tech, Topic
 
 clear = lambda: os.system('cls')
 cross_line = lambda: print('\n' + '-'*25 + '\n')
 empty_line = lambda: input('\n')
 
-def code_loop(topic: Topic):
+def code_loop(topic: Topic, order = None):
     l_codes = get_codes(topic=topic)
     console = Console()
 
     clear()
-    print(topic)
+    print((order + '.' if order != None else '') + ' ' + topic.name)
     empty_line()
 
     for i in range(len(l_codes)):
         code = l_codes[i]
         
-        console.print(Markdown('\n' + str(i + 1) + ' ' + code.descript))
+        console.print(Markdown('\n' + (order + '.' if order != None else '') + str(i + 1) + ' ' + code.descript))
         if code.url_pict != None:
             print(str(code.url_pict))
         while input('\n') != '': continue
@@ -30,6 +30,34 @@ def code_loop(topic: Topic):
             while input('\n') != '': continue
             print('\n' + code.output)
         empty_line()
+
+    while True:
+        clear()
+        print(topic)
+        print('-'*len(topic.name) + '\n')
+        do = input('Enter command or enter(to continue): \n')
+        if do == 'root':
+            l_leafs = get_topic_roots(topic=topic)
+            for i in range(len(l_leafs)):
+                print(l_leafs[i])
+            empty_line()
+            continue
+
+        if do == 'child':
+            l_leafs = get_topic_leafs(topic=topic)
+            for i in range(len(l_leafs)):
+                print(l_leafs[i])
+            empty_line()
+            continue
+        break
+
+    l_childs = get_topic_childs(topic=topic)
+    for i in range(len(l_childs)):
+        print(str(i+1) + '. ' + l_childs[i].name)
+    empty_line()    
+
+    for i in range(len(l_childs)):
+        code_loop(topic = l_childs[i], order = order + '.' + str(i+1) if order != None else str(i+1))
 
 def choose_tech() -> Tech:
     l_techs = get_techs()

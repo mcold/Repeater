@@ -4,7 +4,8 @@ create table if not exists tech(id 		integer primary key autoincrement,
 create table if not exists topic(id 		integer primary key autoincrement,
 								 id_tech 	integer references tech(id) on update cascade,
 								 name 		text,
-								 url 		text);
+								 url 		text,
+								 id_parent	integer references topic(id) on delete cascade);
 									 
 create table if not exists code(id 			integer primary key autoincrement,
 								id_topic	integer references topic(id) on update cascade,
