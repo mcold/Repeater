@@ -1,10 +1,12 @@
 # coding: utf-8
 import os
 import sys
+from random import shuffle
 from rich.console import Console
 from rich.markdown import Markdown
 from db import get_techs, get_tech, get_topics, get_topic_childs, get_topic_leafs, get_topic_roots, get_codes
 from db import Tech, Topic
+
 
 clear = lambda: os.system('cls')
 cross_line = lambda: print('\n' + '-'*25 + '\n')
@@ -15,7 +17,7 @@ def code_loop(topic: Topic, order = None):
     console = Console()
 
     clear()
-    print((order + '.' if order != None else '') + ' ' + topic.name)
+    print((order + '.' if order != None else '') + ' ' + topic.name + ('\n' + topic.url if topic.url != None else '') )
     empty_line()
 
     for i in range(len(l_codes)):
@@ -89,9 +91,10 @@ def choose_topic(tech: Tech) -> Topic:
     for i in range(len(l_topics)):
         topic = l_topics[i]
         d_num[i+1] = topic.id
-        
+
     while True:
         clear()
+
         for i in range(len(l_topics)):
             print(str(i+1) + ' ' + l_topics[i].name)
         cross_line()
@@ -106,18 +109,34 @@ def choose_topic(tech: Tech) -> Topic:
             except ValueError:
                 continue
 
-def topic_loop(tech: Tech):
-    while True:
-        topic = choose_topic(tech=tech)
-        code_loop(topic=topic)
-        clear()
+def topic_loop(tech: Tech, is_rdm: bool):
+    if is_rdm:
+        l_topics = get_topics(tech=tech)
+        l_rdm = list(range(1, len(l_topics)+1))
+        shuffle(l_rdm)
+        for i in range(len(l_rdm)):
+            code_loop(topic=l_topics[i])
+            clear()
+    else:        
+        while True:
+            topic = choose_topic(tech=tech)
+            code_loop(topic=topic)
+            clear()
 
 if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        if sys.argv[2] == 'rdm':
+            tech = get_tech(sys.argv[1])
+            if tech is not None:
+                topic_loop(tech = tech, is_rdm=True)
+                sys.exit()
+            else:
+                topic_loop(choose_tech(), is_rdm=True)
     if len(sys.argv) > 1:
         tech = get_tech(sys.argv[1])
         if tech is not None:
-            topic_loop(tech = tech)
+            topic_loop(tech = tech, is_rdm=False)
         else:
-            topic_loop(choose_tech())
+            topic_loop(choose_tech(), is_rdm=False)
     else:
-      topic_loop(choose_tech())
+      topic_loop(choose_tech(), is_rdm=False)
