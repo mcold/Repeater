@@ -100,18 +100,36 @@ class Word:
     plur_end = ''
     url = ''
 
+    def __init__(self):
+        self.id = 0
+        self.lang = ''
+        self.name = ''
+        self.ru = ''
+        self.genus = ''
+        self.plur_end = ''
+        self.url = ''
+
+
     def __init__(self, t: tuple):
-        self.id = t[0]
-        self.lang = t[1]
-        self.name = t[2]
-        self.ru = t[3]
-        self.genus = t[4]
-        self.plur_end = t[5]
-        self.url = t[6]
+        if len(t) == 0:
+            self.id = 0
+            self.lang = ''
+            self.name = ''
+            self.ru = ''
+            self.genus = ''
+            self.plur_end = ''
+            self.url = ''
+        else:
+            self.id = t[0]
+            self.lang = t[1]
+            self.name = t[2]
+            self.ru = t[3]
+            self.genus = t[4]
+            self.plur_end = t[5]
+            self.url = t[6]
 
     def __str__(self) -> str:
-        # plur_end = ', ' + self.plue_end if self.plue_end != '' else self.plur_end
-        return str(self.name) + '\n' + self.genus + ', ' + self.plur_end if self.plur_end != None else '' + '\n' + (self.url if self.url != None else '')
+        return str(self.name) + '\n' + self.genus + (', ' + self.plur_end if self.plur_end != None else '') + '\n' + (self.url if self.url != None else '')
 
 
 def get_techs() -> list:
@@ -236,30 +254,43 @@ def get_codes(topic: Topic) -> list:
     
     return [Code(result) for result in cur.fetchall()]
 
-def get_sentences(id_item: int, id_word: int) -> list:
+def get_sentences(id_item: int, id_word: int, lang: str) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
-        if id_item is not None:
-            cur.execute("""SELECT id,
-                                  id_item,
-                                  id_word,
-                                  seq_num,
-                                  original,
-                                  ru
-                            FROM sentence 
-                            where id_item = {id_item}
-                            order by seq_num asc;""".format(id_item=id_item))
-        else:
-            if id_word is not None:
+        if lang is not None:
+                    cur.execute("""SELECT s.id,
+                                          s.id_item,
+                                          s.id_word,
+                                          s.seq_num,
+                                          s.original,
+                                          s.ru
+                                    FROM sentence s,
+                                             word w
+                                   where id_word = w.id
+                                     and w.lang = '{lang}'
+                                order by random();""".format(lang=lang))
+        else:                                
+            if id_item is not None:
                 cur.execute("""SELECT id,
-                                  id_item,
-                                  id_word,
-                                  seq_num,
-                                  original,
-                                  ru
-                            from sentence
-                            where id_word = {id_word}
-                            order by seq_num asc;""".format(id_word=id_word))
+                                    id_item,
+                                    id_word,
+                                    seq_num,
+                                    original,
+                                    ru
+                                FROM sentence 
+                                where id_item = {id_item}
+                                order by random();""".format(id_item=id_item))
+            else:
+                if id_word is not None:
+                    cur.execute("""SELECT id,
+                                        id_item,
+                                        id_word,
+                                        seq_num,
+                                        original,
+                                        ru
+                                    FROM sentence
+                                where id_word = {id_word}
+                                order by random();""".format(id_word=id_word))
 
     return [Sentence(result) for result in cur.fetchall()]
 

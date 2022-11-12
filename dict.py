@@ -1,28 +1,34 @@
 # coding: utf-8
-import os
 import sys
-import re
+from os import system
+from re import findall
+from random import shuffle
 from rich.console import Console
 from rich.markdown import Markdown
 from db import get_langs, get_words, get_sentences
 from db import Word
 
-clear = lambda: os.system('cls')
+clear = lambda: system('cls')
 cross_line = lambda: print('\n' + '-'*25 + '\n')
 empty_line = lambda: input('\n')
 
-def sentence_loop(word: Word):
-    l_sents = get_sentences(id_item = None, id_word = word.id)
+def sentence_loop(word: Word, lang = None):
+    l_sents = get_sentences(id_item = None, id_word = word.id, lang = lang)
     console = Console()
 
     clear()
-    print(word)
-    empty_line()
+    if word.id != 0:
+        print(word)
+        empty_line()
 
-    for i in range(len(l_sents)):
+    l_rdm = list(range(1, len(l_sents)+1))
+    shuffle(l_rdm)
+    num = 0
+    for i in [x-1 for x in l_rdm]:
+        num = num + 1
         sent = l_sents[i]
         
-        console.print(Markdown('\n' + str(i + 1) + ' ' + sent.ru))
+        console.print(Markdown('\n' + str(num) + ' ' + sent.ru))
         empty_line()
         console.print(Markdown(repl_reg_items(sent.original)))
         empty_line()
@@ -73,7 +79,7 @@ def choose_word(lang: str) -> Word:
                 continue
 
 def repl_reg_items(x: str) -> str:
-    l_regs = re.findall(r'\[\w+\]\(w*\)', x)
+    l_regs = findall(r'\[\w+\]\(w*\)', x)
     for i in range(len(l_regs)): x = x.replace(l_regs[i], '[...]()')
     return x
 
@@ -84,6 +90,10 @@ def word_loop(lang: str):
         clear()
 
 if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        if sys.argv[2] == 'rdm':
+            sentence_loop(word = Word(tuple()), lang = sys.argv[1])
+            sys.exit()
     if len(sys.argv) > 1:
         word_loop(lang = sys.argv[1])
     else:
