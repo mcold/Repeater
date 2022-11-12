@@ -4,7 +4,7 @@ import sys
 from random import shuffle
 from rich.console import Console
 from rich.markdown import Markdown
-from db import get_techs, get_tech, get_topics, get_topic_childs, get_topic_leafs, get_topic_roots, get_codes
+from db import get_techs, get_tech, get_topics, get_topic_childs, get_topic_leafs, get_topic_roots, get_codes, upd_topic_view, get_topics_order
 from db import Tech, Topic
 
 
@@ -61,6 +61,15 @@ def code_loop(topic: Topic, order = None):
     for i in range(len(l_childs)):
         code_loop(topic = l_childs[i], order = order + '.' + str(i+1) if order != None else str(i+1))
 
+    while True:
+        view_mark = input('Result (+/-): ')
+        if view_mark == '+':
+            upd_topic_view(topic = topic, val = 'now')
+            break
+        if view_mark == '-':
+            upd_topic_view(topic = topic, val = 'null')
+            break
+
 def choose_tech() -> Tech:
     l_techs = get_techs()
     d_num = dict()
@@ -109,7 +118,7 @@ def choose_topic(tech: Tech) -> Topic:
             except ValueError:
                 continue
 
-def topic_loop(tech: Tech, is_rdm: bool):
+def topic_loop(tech: Tech, is_rdm: bool, is_order: bool):
     if is_rdm:
         l_topics = get_topics(tech=tech)
         l_rdm = list(range(1, len(l_topics)+1))
@@ -117,26 +126,40 @@ def topic_loop(tech: Tech, is_rdm: bool):
         for i in range(len(l_rdm)):
             code_loop(topic=l_topics[i])
             clear()
-    else:        
-        while True:
-            topic = choose_topic(tech=tech)
-            code_loop(topic=topic)
-            clear()
+    else:
+        if is_order:
+            l_topics = get_topics_order(tech=tech)
+            for i in range(len(l_topics)):
+                code_loop(topic=l_topics[i])
+                clear()
+        else:        
+            while True:
+                topic = choose_topic(tech=tech)
+                code_loop(topic=topic)
+                clear()
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
         if sys.argv[2] == 'rdm':
             tech = get_tech(sys.argv[1])
             if tech is not None:
-                topic_loop(tech = tech, is_rdm=True)
+                topic_loop(tech = tech, is_rdm=True, is_order=False)
                 sys.exit()
             else:
-                topic_loop(choose_tech(), is_rdm=True)
+                topic_loop(choose_tech(), is_rdm=True, is_order=False)
+        else:
+            if sys.argv[2] == 'order':
+                tech = get_tech(sys.argv[1])
+                if tech is not None:
+                    topic_loop(tech = tech, is_rdm=False, is_order=True)
+                    sys.exit()
+                else:
+                    topic_loop(choose_tech(), is_rdm=False, is_order=True) 
     if len(sys.argv) > 1:
         tech = get_tech(sys.argv[1])
         if tech is not None:
-            topic_loop(tech = tech, is_rdm=False)
+            topic_loop(tech = tech, is_rdm=False, is_order=False)
         else:
-            topic_loop(choose_tech(), is_rdm=False)
+            topic_loop(choose_tech(), is_rdm=False, is_order=False)
     else:
-      topic_loop(choose_tech(), is_rdm=False)
+      topic_loop(choose_tech(), is_rdm=False, is_order=False)

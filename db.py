@@ -178,6 +178,23 @@ def get_topics(tech: Tech) -> list:
 
     return [Topic(result) for result in cur.fetchall()]
 
+def get_topics_order(tech: Tech) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id, 
+                            id_tech, 
+                            name,
+                            url,
+                            id_parent
+                        from topic
+                        where id_tech = {id_tech}
+                        order by view_date
+                        nulls first;
+                    """.format(id_tech = tech.id))
+
+    return [Topic(result) for result in cur.fetchall()]    
+
 def get_topic_leafs(topic: Topic) -> list:
     """
         Leaf = Topic + level
@@ -337,6 +354,14 @@ def get_words(lang: str) -> list:
                     """.format(lang = lang))
 
     return [Word(result) for result in cur.fetchall()]
+
+def upd_topic_view(topic: Topic, val: str):
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute( """update topic
+                        set view_date = datetime('{val}','localtime')
+                        where id = {id_topic}
+                    """.format(id_topic = topic.id, val = val))
 
 if __name__ == "__main__":
     print(get_tech('out'))
