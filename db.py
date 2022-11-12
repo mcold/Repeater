@@ -96,6 +96,8 @@ class Word:
     lang = ''
     name = ''
     ru = ''
+    genus = ''
+    plur_end = ''
     url = ''
 
     def __init__(self, t: tuple):
@@ -103,10 +105,13 @@ class Word:
         self.lang = t[1]
         self.name = t[2]
         self.ru = t[3]
-        self.url = t[4]
+        self.genus = t[4]
+        self.plur_end = t[5]
+        self.url = t[6]
 
     def __str__(self) -> str:
-        return str(self.name) + '\n' + (self.url if self.url != None else '')
+        # plur_end = ', ' + self.plue_end if self.plue_end != '' else self.plur_end
+        return str(self.name) + '\n' + self.genus + ', ' + self.plur_end if self.plur_end != None else '' + '\n' + (self.url if self.url != None else '')
 
 
 def get_techs() -> list:
@@ -292,6 +297,8 @@ def get_words(lang: str) -> list:
                             lang,
                             name,
                             ru,
+                            genus,
+                            plur_end,
                             url
                         from word
                         where lang = '{lang}'

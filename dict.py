@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import sys
+import re
 from rich.console import Console
 from rich.markdown import Markdown
 from db import get_langs, get_words, get_sentences
@@ -23,6 +24,8 @@ def sentence_loop(word: Word):
         
         console.print(Markdown('\n' + str(i + 1) + ' ' + sent.ru))
         empty_line()
+        console.print(Markdown(repl_reg_items(sent.original)))
+        empty_line()
         console.print(Markdown(sent.original))
         empty_line()
 
@@ -34,7 +37,7 @@ def choose_lang() -> str:
         for i in range(len(l_langs)):
             print(str(i+1) + ' ' + l_langs[i])
         cross_line()
-        x = input('Enter number of tech (or type exit): ')
+        x = input('Enter number of lang (or type exit): ')
         if x.lower() in ('exit', 'quit') or x.lower().startswith('q') or x.lower().startswith('e'):
             sys.exit()
         else:
@@ -68,6 +71,11 @@ def choose_word(lang: str) -> Word:
                 continue
             except ValueError:
                 continue
+
+def repl_reg_items(x: str) -> str:
+    l_regs = re.findall(r'\[\w+\]\(w*\)', x)
+    for i in range(len(l_regs)): x = x.replace(l_regs[i], '[...]()')
+    return x
 
 def word_loop(lang: str):
     while True:
