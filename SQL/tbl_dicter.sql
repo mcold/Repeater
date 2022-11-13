@@ -4,5 +4,6 @@ create table if not exists word(id 			integer primary key autoincrement,
 								ru			text,
 								genus		text,
 								plur_end 	text,
-								url 		text);
+								url 		text,
+								view_date	date);
 									

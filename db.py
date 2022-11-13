@@ -189,7 +189,7 @@ def get_topics_order(tech: Tech) -> list:
                             id_parent
                         from topic
                         where id_tech = {id_tech}
-                        order by view_date
+                        order by view_date asc, id asc
                         nulls first;
                     """.format(id_tech = tech.id))
 
@@ -271,21 +271,35 @@ def get_codes(topic: Topic) -> list:
     
     return [Code(result) for result in cur.fetchall()]
 
-def get_sentences(id_item: int, id_word: int, lang: str) -> list:
+def get_sentences(id_item: int, id_word: int, lang: str, is_order: bool) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         if lang is not None:
-                    cur.execute("""SELECT s.id,
-                                          s.id_item,
-                                          s.id_word,
-                                          s.seq_num,
-                                          s.original,
-                                          s.ru
-                                    FROM sentence s,
-                                             word w
-                                   where id_word = w.id
-                                     and w.lang = '{lang}'
-                                order by random();""".format(lang=lang))
+            if is_order == True:
+                cur.execute("""SELECT s.id,
+                                        s.id_item,
+                                        s.id_word,
+                                        s.seq_num,
+                                        s.original,
+                                        s.ru
+                                FROM sentence s,
+                                            word w
+                                where id_word = w.id
+                                    and w.lang = '{lang}'
+                            order by s.view_date asc, s.id asc
+                            nulls first;""".format(lang=lang))
+            else:
+                cur.execute("""SELECT s.id,
+                                        s.id_item,
+                                        s.id_word,
+                                        s.seq_num,
+                                        s.original,
+                                        s.ru
+                                FROM sentence s,
+                                            word w
+                                where id_word = w.id
+                                    and w.lang = '{lang}'
+                            order by random();""".format(lang=lang))
         else:                                
             if id_item is not None:
                 cur.execute("""SELECT id,
@@ -362,6 +376,14 @@ def upd_topic_view(topic: Topic, val: str):
                         set view_date = datetime('{val}','localtime')
                         where id = {id_topic}
                     """.format(id_topic = topic.id, val = val))
+
+def upd_sentence_view(sentence: Sentence, val: str):
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute( """update sentence
+                        set view_date = datetime('{val}','localtime')
+                        where id = {id_sent}
+                    """.format(id_sent = sentence.id, val = val))
 
 if __name__ == "__main__":
     print(get_tech('out'))
