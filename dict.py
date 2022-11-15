@@ -107,7 +107,7 @@ def repl_reg_items(x: str) -> str:
 def word_loop(lang: str):
     while True:
         word = choose_word(lang=lang)
-        sentence_loop(word=word)
+        sentence_loop(word=word, is_order=False)
         clear()
 
 if __name__ == "__main__":

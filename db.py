@@ -129,7 +129,12 @@ class Word:
             self.url = t[6]
 
     def __str__(self) -> str:
-        return str(self.name) + '\n' + self.genus + (', ' + self.plur_end if self.plur_end != None else '') + '\n' + (self.url if self.url != None else '')
+        l_str = []
+        if self.genus != None:
+            l_str.append(self.genus)
+        if self.plur_end != None:
+            l_str.append(self.plur_end)            
+        return str(self.name) + '\n' + ",".join(l_str) + '\n' + (self.url if self.url != None else '')
 
 
 def get_techs() -> list:
