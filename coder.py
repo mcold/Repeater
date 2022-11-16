@@ -23,7 +23,8 @@ def code_loop(topic: Topic, order = None):
     for i in range(len(l_codes)):
         code = l_codes[i]
         
-        console.print(Markdown('\n' + (order + '.' if order != None else '') + str(i + 1) + ' ' + code.descript))
+        console.print(Markdown('\n' + code.descript))
+        # console.print(Markdown('\n' + (order + '.' if order != None else '') + str(i + 1) + ' ' + code.descript))
         if code.url_pict != None:
             print(str(code.url_pict))
         while input('\n') != '': continue

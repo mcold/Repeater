@@ -22,39 +22,53 @@ def sentence_loop(word: Word, is_order: bool,  lang = None):
         empty_line()
     
     if is_order:
-        num = 0
         for i in range(len(l_sents)):
-            num = num + 1
             sent = l_sents[i]
-            console.print(Markdown('\n' + str(num) + ' ' + sent.ru))
-            empty_line()
+            clear()
+
+            console.print(Markdown('\n' + ' ' + sent.ru))
+            if input('\n') == '+':
+                upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
+            
             console.print(Markdown(repl_reg_items(sent.original)))
-            empty_line()
+            if input('\n') == '+':
+                upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
+            
             console.print(Markdown(sent.original))
             view_mark = input('\n')
-
             if view_mark == '+':
                 upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
             if view_mark == '-':
                 upd_sentence_view(sentence = l_sents[i], val = 'null')
+                continue
     else:
         l_rdm = list(range(1, len(l_sents)+1))
         shuffle(l_rdm)
-        num = 0
         for i in [x-1 for x in l_rdm]:
-            num = num + 1
             sent = l_sents[i]
             
-            console.print(Markdown('\n' + str(num) + ' ' + sent.ru))
-            empty_line()
+            clear()
+            console.print(Markdown('\n' + sent.ru))
+            if input('\n') == '+':
+                upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
+
             console.print(Markdown(repl_reg_items(sent.original)))
-            empty_line()
+            if input('\n') == '+':
+                upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
+
             console.print(Markdown(sent.original))
             view_mark = input('\n')
             if view_mark == '+':
                 upd_sentence_view(sentence = l_sents[i], val = 'now')
+                continue
             if view_mark == '-':
                 upd_sentence_view(sentence = l_sents[i], val = 'null')
+                continue
 
 def choose_lang() -> str:
     l_langs = get_langs()
@@ -100,7 +114,7 @@ def choose_word(lang: str) -> Word:
                 continue
 
 def repl_reg_items(x: str) -> str:
-    l_regs = findall(r'\[\w+\]\(w*\)', x)
+    l_regs = findall(r'\[\w*\s*\w*\s*\w*\s*\w*\s*\w*\s*\w*\w*\s*\w*\s*\w*\]\(w*\)', x)
     for i in range(len(l_regs)): x = x.replace(l_regs[i], '[...]()')
     return x
 
