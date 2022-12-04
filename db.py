@@ -90,6 +90,9 @@ class Sentence:
         self.seq_num = t[3]
         self.original = t[4]
         self.ru = t[5]
+    
+    def __str__(self):
+        return '{id}: id_word = {id_word}: {original}'.format(id = self.id, id_word = self.id_word, original = self.original)
 
 class Word:
     id = 0
@@ -108,6 +111,7 @@ class Word:
         self.genus = ''
         self.plur_end = ''
         self.url = ''
+        self.type = ''
 
 
     def __init__(self, t: tuple):
@@ -119,6 +123,7 @@ class Word:
             self.genus = ''
             self.plur_end = ''
             self.url = ''
+            self.type = ''
         else:
             self.id = t[0]
             self.lang = t[1]
@@ -127,6 +132,7 @@ class Word:
             self.genus = t[4]
             self.plur_end = t[5]
             self.url = t[6]
+            self.type = t[7]
 
     def __str__(self) -> str:
         l_str = []
@@ -276,57 +282,27 @@ def get_codes(topic: Topic) -> list:
     
     return [Code(result) for result in cur.fetchall()]
 
-def get_sentences(id_item: int, id_word: int, lang: str, is_order: bool) -> list:
+def get_sentences(d: dict) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
-        if lang is not None:
-            if is_order == True:
-                cur.execute("""SELECT s.id,
-                                        s.id_item,
-                                        s.id_word,
-                                        s.seq_num,
-                                        s.original,
-                                        s.ru
-                                FROM sentence s,
-                                            word w
-                                where id_word = w.id
-                                    and w.lang = '{lang}'
-                            order by s.view_date asc, s.id asc
-                            nulls first;""".format(lang=lang))
-            else:
-                cur.execute("""SELECT s.id,
-                                        s.id_item,
-                                        s.id_word,
-                                        s.seq_num,
-                                        s.original,
-                                        s.ru
-                                FROM sentence s,
-                                            word w
-                                where id_word = w.id
-                                    and w.lang = '{lang}'
-                            order by random();""".format(lang=lang))
-        else:                                
-            if id_item is not None:
-                cur.execute("""SELECT id,
-                                    id_item,
-                                    id_word,
-                                    seq_num,
-                                    original,
-                                    ru
-                                FROM sentence 
-                                where id_item = {id_item}
-                                order by random();""".format(id_item=id_item))
-            else:
-                if id_word is not None:
-                    cur.execute("""SELECT id,
-                                        id_item,
-                                        id_word,
-                                        seq_num,
-                                        original,
-                                        ru
-                                    FROM sentence
-                                where id_word = {id_word}
-                                order by random();""".format(id_word=id_word))
+        cur.execute("""SELECT s.id,
+                              s.id_item,
+                              s.id_word,
+                              s.seq_num,
+                              s.original,
+                              s.ru
+                         FROM sentence s,
+                                word w
+                    where 1=1 
+                        and id_word = w.id
+                        {lang_condition} {item_condition} {word_condition} {type_condition}
+                order by {order};""".format(
+                                    lang_condition="\nand w.lang = '{lang}'".format(lang=d.get('lang')) if d.get('lang') != None else '',
+                                    item_condition="\nand s.id_item = {id_item}".format(id_item=d.get('id_item')) if d.get('id_item') != None else '',
+                                    word_condition="\nand s.id_word = {id_word}".format(id_word=d.get('id_word')) if d.get('id_word') != None else '',
+                                    type_condition="\nand w.type = '{type}'".format(type=d.get('type')) if d.get('type') != None else '',
+                                    order="\norder by s.view_date asc, s.id asc nulls first" if d.get('order') == 'order' else 'random()')
+                                    )
 
     return [Sentence(result) for result in cur.fetchall()]
 
@@ -366,10 +342,11 @@ def get_words(lang: str) -> list:
                             ru,
                             genus,
                             plur_end,
-                            url
+                            url,
+                            type
                         from word
                         where lang = '{lang}'
-                        order by name desc;
+                        order by name asc;
                     """.format(lang = lang))
 
     return [Word(result) for result in cur.fetchall()]

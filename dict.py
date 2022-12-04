@@ -12,16 +12,12 @@ clear = lambda: system('cls')
 cross_line = lambda: print('\n' + '-'*25 + '\n')
 empty_line = lambda: input('\n')
 
-def sentence_loop(word: Word, is_order: bool,  lang = None):
-    l_sents = get_sentences(id_item = None, id_word = word.id, lang = lang, is_order = is_order)
+def sentence_loop(d_arg: dict):
+    l_sents = get_sentences(d = d_arg)
     console = Console()
-
     clear()
-    if word.id != 0:
-        print(word)
-        empty_line()
     
-    if is_order:
+    if d_arg.get('order') == 'order':
         for i in range(len(l_sents)):
             sent = l_sents[i]
             clear()
@@ -118,22 +114,7 @@ def repl_reg_items(x: str) -> str:
     for i in range(len(l_regs)): x = x.replace(l_regs[i], '[...]()')
     return x
 
-def word_loop(lang: str):
-    while True:
-        word = choose_word(lang=lang)
-        sentence_loop(word=word, is_order=False)
-        clear()
-
 if __name__ == "__main__":
-    if len(sys.argv) > 2:
-        if sys.argv[2] == 'rdm':
-            sentence_loop(word = Word(tuple()), lang = sys.argv[1], is_order = False)
-            sys.exit()
-        else:
-            if sys.argv[2] == 'order':
-                sentence_loop(word = Word(tuple()), lang = sys.argv[1], is_order = True)
-                sys.exit()
-    if len(sys.argv) > 1:
-        word_loop(lang = sys.argv[1])
-    else:
-        word_loop(choose_lang())
+    d_arg = dict([(arg.split('=')[0], arg.split('=')[1]) for arg in sys.argv[1:]])
+    if d_arg.get('lang') is None: d_arg['lang'] = choose_lang()
+    sentence_loop(d_arg)
