@@ -4,7 +4,7 @@ import sys
 from random import shuffle
 from rich.console import Console
 from rich.markdown import Markdown
-from db import get_techs, get_tech, get_topics, get_topic_childs, get_topic_leafs, get_topic_roots, get_codes, upd_topic_view, get_topics_order
+from db import *
 from db import Tech, Topic
 
 
