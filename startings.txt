@@ -1,0 +1,9 @@
+word:
+    python word.py lang=eng type=adj
+    python word.py lang=eng type=noun
+    python word.py lang=eng type=phrase
+    python word.py lang=eng type=verb
+    python word.py lang=eng type=verb+
+
+    -- book
+    python word.py lang=eng book_title=beartown

@@ -339,21 +339,23 @@ def get_words(d: dict) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
-                        select id,
-                            lang,
-                            name,
-                            ru,
-                            genus,
-                            plur_end,
-                            url,
-                            type
+                        select w.id,
+                               w.lang,
+                               w.name,
+                               w.ru,
+                               w.genus,
+                               w.plur_end,
+                               w.url,
+                               w.type
                         from word w
+                        left join book b on w.id_book = b.id
                         where 1=1
-                          {lang_condition} {type_condition} {name_condition}
+                          {lang_condition} {type_condition} {name_condition} {book_condition}
                         order by {order};""".format(
                                               lang_condition="\nand lower(w.lang) = lower('{lang}')".format(lang=d.get('lang')) if d.get('lang') != None else '',
                                               type_condition="\nand lower(w.type) = lower('{type}')".format(type=d.get('type')) if d.get('type') != None else '',
                                               name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('name')) if d.get('name') != None else '',
+                                              book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book_title')) if d.get('book_title') != None else '',
                                               order="\nrandom()" if d.get('random') == 'random' else 'w.name')
                                               )
 
