@@ -356,7 +356,7 @@ def get_words(d: dict) -> list:
                                               type_condition="\nand lower(w.type) = lower('{type}')".format(type=d.get('type')) if d.get('type') != None else '',
                                               name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('name')) if d.get('name') != None else '',
                                               book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book')) if d.get('book') != None else '',
-                                              order="\nrandom()" if d.get('random') == 'random' else 'w.name')
+                                              order="\nrandom()" if d.get('order') == 'random' else 'w.name')
                                               )
 
     return [Word(result) for result in cur.fetchall()]

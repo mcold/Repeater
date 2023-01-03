@@ -43,20 +43,33 @@ def sents(lang: str = 'eng', type: str = None, word: str = None, order: str = 'r
             continue
 
 @app.command()
-def words(lang: str = 'eng', type: str = None, name: str = None, book: str = None):
-    d_arg = {'lang': lang, 'type': type, 'name': name, 'book': book}
+def words(lang: str = 'eng', type: str = None, name: str = None, book: str = None, way: str = 'original', order: str = 'random'):
+    d_arg = {'lang': lang, 'type': type, 'name': name, 'book': book, 'order': order}
     l_words = get_words(d_arg)
     console = Console()
     clear()
 
-    for i in range(len(l_words)):
-        wrd = l_words[i]
-        clear()
+    if way == 'original':
+        for i in range(len(l_words)):
+            wrd = l_words[i]
+            clear()
 
-        console.print(Markdown('\n' + ' ' + wrd.name))
-        empty_line()
-        console.print(Markdown('\n' + ' ' + wrd.ru))
-        empty_line()        
+            console.print(Markdown('\n' + ' ' + wrd.name))
+            while input('\n') != '': continue
+            console.print(Markdown('\n' + ' ' + wrd.ru))
+            empty_line()
+    else:
+        if way == 'ru':
+            for i in range(len(l_words)):
+                wrd = l_words[i]
+                clear()
+
+                console.print(Markdown('\n' + ' ' + wrd.ru))
+                while input('\n') != '': continue
+                if type == 'verb+': console.print('\n' + wrd.name.split(' ')[0])
+                while input('\n') != '': continue
+                console.print(Markdown('\n' + ' ' + wrd.name))
+                empty_line()
 
 def repl_reg_items(x: str) -> str:
     l_regs = findall(r'\[\w*\s*\w*\s*\w*\s*\w*\s*\w*\s*\w*\w*\s*\w*\s*\w*\]\(w*\)', x)
