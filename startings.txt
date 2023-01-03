@@ -1,9 +1,17 @@
+dict:
+    --verb+
+        python dict.py sents --lang=eng --type=verb+ --word=get
+        python dict.py sents --lang=eng --type=verb+ --word=let
+        python dict.py sents --lang=eng --type=verb+ --word=take
+        python dict.py sents --lang=eng --type=verb+ --word=take --order=order
+
 word:
-    python word.py lang=eng type=adj
-    python word.py lang=eng type=noun
-    python word.py lang=eng type=phrase
-    python word.py lang=eng type=verb
-    python word.py lang=eng type=verb+
+    python dict.py words lang=eng type=adj
+    python dict.py words lang=eng type=noun
+    python dict.py words lang=eng type=phrase
+    python dict.py words lang=eng type=verb
+    python dict.py words lang=eng type=verb+
+    python dict.py words --type=adj
 
     -- book
-    python word.py lang=eng book_title=beartown
+    python dict.py words --book=beartown

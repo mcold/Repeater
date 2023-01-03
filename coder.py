@@ -5,7 +5,6 @@ from random import shuffle
 from rich.console import Console
 from rich.markdown import Markdown
 from db import *
-from db import Tech, Topic
 
 
 clear = lambda: os.system('cls')

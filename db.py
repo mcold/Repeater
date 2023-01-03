@@ -302,7 +302,7 @@ def get_sentences(d: dict) -> list:
                 order by {order};""".format(
                                     lang_condition="\nand w.lang = '{lang}'".format(lang=d.get('lang')) if d.get('lang') != None else '',
                                     item_condition="\nand s.id_item = {id_item}".format(id_item=d.get('id_item')) if d.get('id_item') != None else '',
-                                    word_condition="\nand s.id_word = {id_word}".format(id_word=d.get('id_word')) if d.get('id_word') != None else '',
+                                    word_condition="\nand lower(w.name) like lower('%{word}%')".format(word=d.get('word')) if d.get('word') != None else '',
                                     type_condition="\nand w.type = '{type}'".format(type=d.get('type')) if d.get('type') != None else '',
                                     order="\ns.view_date asc, s.id asc nulls first" if d.get('order') == 'order' else 'random()')
                                     )
@@ -355,7 +355,7 @@ def get_words(d: dict) -> list:
                                               lang_condition="\nand lower(w.lang) = lower('{lang}')".format(lang=d.get('lang')) if d.get('lang') != None else '',
                                               type_condition="\nand lower(w.type) = lower('{type}')".format(type=d.get('type')) if d.get('type') != None else '',
                                               name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('name')) if d.get('name') != None else '',
-                                              book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book_title')) if d.get('book_title') != None else '',
+                                              book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book')) if d.get('book') != None else '',
                                               order="\nrandom()" if d.get('random') == 'random' else 'w.name')
                                               )
 
