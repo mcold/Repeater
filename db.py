@@ -139,9 +139,12 @@ class Word:
         if self.genus != None:
             l_str.append(self.genus)
         if self.plur_end != None:
-            l_str.append(self.plur_end)            
-        return str(self.name) + '\n' + ",".join(l_str) + '\n' + (self.url if self.url != None else '')
-
+            l_str.append(self.plur_end)
+        return '{name}{ru}{other}'.format(
+                                    name = self.name,
+                                    ru =  '\n{ru}'.format(ru = self.ru) if self.ru != None else '',
+                                    other = '\n{other}'.format(other = ",".join(l_str) + ('\n' + self.url if self.url != None else ''))
+                            )
 
 def get_techs() -> list:
     with sqlite3.connect(db) as conn:
@@ -301,7 +304,7 @@ def get_sentences(d: dict) -> list:
                                     item_condition="\nand s.id_item = {id_item}".format(id_item=d.get('id_item')) if d.get('id_item') != None else '',
                                     word_condition="\nand s.id_word = {id_word}".format(id_word=d.get('id_word')) if d.get('id_word') != None else '',
                                     type_condition="\nand w.type = '{type}'".format(type=d.get('type')) if d.get('type') != None else '',
-                                    order="\norder by s.view_date asc, s.id asc nulls first" if d.get('order') == 'order' else 'random()')
+                                    order="\ns.view_date asc, s.id asc nulls first" if d.get('order') == 'order' else 'random()')
                                     )
 
     return [Sentence(result) for result in cur.fetchall()]
@@ -332,7 +335,7 @@ def get_langs() -> list:
 
     return [x[0] for x in cur.fetchall()]
 
-def get_words(lang: str) -> list:
+def get_words(d: dict) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
         cur.execute("""
@@ -344,10 +347,15 @@ def get_words(lang: str) -> list:
                             plur_end,
                             url,
                             type
-                        from word
-                        where lang = '{lang}'
-                        order by name asc;
-                    """.format(lang = lang))
+                        from word w
+                        where 1=1
+                          {lang_condition} {type_condition} {name_condition}
+                        order by {order};""".format(
+                                              lang_condition="\nand lower(w.lang) = lower('{lang}')".format(lang=d.get('lang')) if d.get('lang') != None else '',
+                                              type_condition="\nand lower(w.type) = lower('{type}')".format(type=d.get('type')) if d.get('type') != None else '',
+                                              name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('name')) if d.get('name') != None else '',
+                                              order="\nrandom()" if d.get('random') == 'random' else 'w.name')
+                                              )
 
     return [Word(result) for result in cur.fetchall()]
 
