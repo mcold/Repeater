@@ -192,6 +192,24 @@ def get_topics(tech: Tech) -> list:
 
     return [Topic(result) for result in cur.fetchall()]
 
+def get_topic(token: str) -> Topic:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select id, 
+                            id_tech, 
+                            name,
+                            url,
+                            id_parent
+                        from topic
+                        where name like '%{token}%';
+                    """.format(token=token))
+    result = cur.fetchone()
+    if result is None:
+        return None
+    else:        
+        return Topic(result)
+
 def get_topics_order(tech: Tech) -> list:
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
