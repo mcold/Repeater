@@ -1,27 +1,27 @@
-dict:
+voc:
     --verb+
-        python dict.py sents --lang=eng --type=verb+ --word=get
-        python dict.py sents eng verb+ let
-        python dict.py sents eng verb+ take
-        python dict.py sents eng verb+ take order
-        python dict.py sents --lang=eng --type=verb+ --word=take
-        python dict.py sents --lang=eng --type=verb+ --word=take --order=order
+        voc sents --lang=eng --type=verb+ --word=get
+        voc sents --lang=eng --type=verb+ --word=let
+        voc sents --lang=eng --type=verb+ --word=take
+        voc sents --lang=eng --type=verb+ --word=take --order=order
+        voc sents --lang=eng --type=verb+ --word=take
+        voc sents --lang=eng --type=verb+ --word=take --order=order
 
     word:
-        python dict.py words eng adj ru
-        python dict.py words eng adj eng
+        voc words eng adj ru
+        voc words eng adj eng
         
 
-        python dict.py words eng --name=browbeat
+        voc words eng --name=browbeat
 
         -- book
-        python dict.py words --book=beartown
+        voc words --book=beartown
 
-coder:
+pro:
     -- tech
-    python coder.py topic-list --tech=pg
-    python coder.py topic-list --tech=python
+    pro topic-list --tech=pg
+    pro topic-list --tech=python
 
     -- topic
-    python coder.py topic-loop --name=INDEXES
-    python coder.py topic-loop --name=Buffer_cache
+    pro topic-loop --name=INDEXES
+    pro topic-loop --name=Buffer_cache
