@@ -372,7 +372,7 @@ def get_words(d: dict) -> list:
                         order by {order};""".format(
                                               lang_condition="\nand lower(w.lang) = lower('{lang}')".format(lang=d.get('lang')) if d.get('lang') != None else '',
                                               type_condition="\nand lower(w.type) = lower('{type}')".format(type=d.get('type')) if d.get('type') != None else '',
-                                              name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('name')) if d.get('name') != None else '',
+                                              name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('word')) if d.get('word') != None else '',
                                               book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book')) if d.get('book') != None else '',
                                               order="\nrandom()" if d.get('order') == 'random' else 'w.name')
                                               )

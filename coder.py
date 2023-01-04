@@ -6,6 +6,10 @@ from rich.console import Console
 from rich.markdown import Markdown
 from db import *
 
+""""
+Programming training module
+"""
+
 app = typer.Typer()
 
 clear = lambda: os.system('cls')
@@ -30,8 +34,7 @@ def topic_list(tech: str = None):
     for topic in get_topics(tech=get_tech(token = tech)): print(topic.name)
 
 @app.command()
-def topic_loop(name: str  = typer.Argument(None, help = "Topic's name"), 
-               order: str = typer.Argument(None, help = "Order number of code-snippets", rich_help_panel = "Secondary Arguments")):
+def topic_loop(name: str  = None, order: str = None):
     """
     Topic's snippets repeat
     """    

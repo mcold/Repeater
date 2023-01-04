@@ -1,20 +1,18 @@
 dict:
     --verb+
         python dict.py sents --lang=eng --type=verb+ --word=get
-        python dict.py sents --lang=eng --type=verb+ --word=let
+        python dict.py sents eng verb+ let
+        python dict.py sents eng verb+ take
+        python dict.py sents eng verb+ take order
         python dict.py sents --lang=eng --type=verb+ --word=take
         python dict.py sents --lang=eng --type=verb+ --word=take --order=order
 
     word:
-        python dict.py words --lang=eng --type=adj --way=ru
-        python dict.py words --lang=eng --type=noun --way=ru
-        python dict.py words --lang=eng --type=phrase --way=ru
-        python dict.py words --lang=eng --type=verb --way=ru
-        python dict.py words --lang=eng --type=verb+ --way=ru
-        python dict.py words --type=adj
+        python dict.py words eng adj ru
+        python dict.py words eng adj eng
+        
 
-
-        python dict.py words --lang=eng --name=browbeat
+        python dict.py words eng --name=browbeat
 
         -- book
         python dict.py words --book=beartown
@@ -25,5 +23,5 @@ coder:
     python coder.py topic-list --tech=python
 
     -- topic
-    python coder.py topic-loop INDEXES
-    python coder.py topic-loop Buffer_cache
+    python coder.py topic-loop --name=INDEXES
+    python coder.py topic-loop --name=Buffer_cache
