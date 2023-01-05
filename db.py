@@ -2,6 +2,9 @@
 import sqlite3
 
 db = 'DB.db'
+cross_len = 40
+dif = 5
+
 
 class Tech:
     id = 0
@@ -140,11 +143,73 @@ class Word:
             l_str.append(self.genus)
         if self.plur_end != None:
             l_str.append(self.plur_end)
-        return '{name}{ru}{other}'.format(
+        return '{name}\n{ru}\n{other}'.format(
                                     name = self.name,
-                                    ru =  '\n{ru}'.format(ru = self.ru) if self.ru != None else '',
-                                    other = '\n{other}'.format(other = ",".join(l_str) + ('\n' + self.url if self.url != None else ''))
+                                    ru =  '{ru}'.format(ru = self.ru) if self.ru != None else '',
+                                    other = '{other}'.format(other = ",".join(l_str) + ('\n' + self.url if self.url != None else ''))
                             )
+class DPrasens:
+    id = 0
+    id_word = 0
+    ich = ''
+    du = ''
+    er_sie_es = ''
+    wir = ''
+    ihr = ''
+    Sie = ''
+    tense = 'Präsens'
+
+    def __init__(self, t: tuple) -> None:
+        if len(t) == 0:
+            self.id = 0
+            self.id_word = 0
+            self.ich = ''
+            self.du = ''
+            self.er_sie_es = ''
+            self.wir = ''
+            self.ihr = ''
+            self.Sie = ''
+        else:
+            self.id = t[0]
+            self.id_word = t[1]
+            self.ich = t[2]
+            self.du = t[3]
+            self.er_sie_es = t[4]
+            self.wir = t[5]
+            self.ihr = t[6]
+            self.Sie = t[7]
+
+    def __str__(self) -> str:
+        global cross_len
+        global dif
+        return """\n{title}
+                  \nich\t\t{ich}
+                  \ndu\t\t{du}
+                  \ner/sie/es\t{er_sie_es}
+                  \nwir\t\t{wir}
+                  \nihr\t\t{ihr}
+                  \nSie\t\t{Sie}
+               """.format(title='-' * dif + ' ' + self.tense + ' ' + '-'*(cross_len - dif - len(self.tense) - 2),
+                          ich = self.ich,
+                          du = self.du,
+                          er_sie_es = self.er_sie_es,
+                          wir = self.wir,
+                          ihr = self.ihr,
+                          Sie = self.Sie)
+
+class DVerb:
+    word = Word(tuple())
+    dprasens = DPrasens(tuple())
+
+    def __init__(self, w: Word) -> None:
+        self.word = w
+        self.dprasens = get_dprasent(self.word.id)
+    
+    def __str__(self) -> str:
+        global cross_len
+        return '{cross}\n{word}{dprasens}'.format(cross = '-'*cross_len,
+                                                word = self.word.__str__(), 
+                                                dprasens = self.dprasens.__str__())
 
 def get_techs() -> list:
     with sqlite3.connect(db) as conn:
@@ -378,6 +443,54 @@ def get_words(d: dict) -> list:
                                               )
 
     return [Word(result) for result in cur.fetchall()]
+
+def get_dverbs(d: dict) -> list:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                        select w.id,
+                               w.lang,
+                               w.name,
+                               w.ru,
+                               w.genus,
+                               w.plur_end,
+                               w.url,
+                               w.type
+                        from word w
+                        left join book b on w.id_book = b.id
+                        where 1=1
+                          and w.lang = 'deu'
+                          and w.type = 'verb'
+                          {name_condition}{book_condition}
+                        order by {order};""".format(
+                                              name_condition="\nand lower(w.name) like lower('%{name}%')".format(name=d.get('word')) if d.get('word') != None else '',
+                                              book_condition="\nand lower(b.title) like lower('%{title}%')".format(title=d.get('book')) if d.get('book') != None else '',
+                                              order="\nrandom()" if d.get('order') == 'random' else 'w.name')
+                                              )
+
+    return [DVerb(Word(result)) for result in cur.fetchall()]
+
+def get_dprasent(id_word: int) -> DPrasens:
+    with sqlite3.connect(db) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                            select id, 
+                                id_word, 
+                                ich,
+                                du,
+                                er_sie_es,
+                                wir,
+                                ihr,
+                                Sie
+                            from deu_prasens
+                            where id_word = {id_word};
+                        """.format(id_word=id_word))
+            
+            result = cur.fetchone()
+            if result is None:
+                return None
+            else:        
+                return DPrasens(result)
 
 def upd_topic_view(topic: Topic, val: str):
     with sqlite3.connect(db) as conn:

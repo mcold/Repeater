@@ -7,7 +7,7 @@ from rich.markdown import Markdown
 from db import *
 
 """"
-Programming training module
+Coder training module
 """
 
 app = typer.Typer()
@@ -39,7 +39,7 @@ def topic_loop(name: str  = None, order: str = None):
     Topic's snippets repeat
     """    
     topic = get_topic(token = name)
-    l_codes = get_codes(topic=topic)
+    l_codes = get_codes(topic = topic)
     console = Console()
 
     clear()

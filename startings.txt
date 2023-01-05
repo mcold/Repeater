@@ -1,3 +1,16 @@
+deu:
+    deu verbs-train
+    deu verb-tense <verb>
+
+pro:
+    -- tech
+    pro topic-list --tech=pg
+    pro topic-list --tech=python
+
+    -- topic
+    pro topic-loop --name=INDEXES
+    pro topic-loop --name=Buffer_cache
+
 voc:
     --verb+
         voc sents --lang=eng --type=verb+ --word=get
@@ -16,12 +29,3 @@ voc:
 
         -- book
         voc words --book=beartown
-
-pro:
-    -- tech
-    pro topic-list --tech=pg
-    pro topic-list --tech=python
-
-    -- topic
-    pro topic-loop --name=INDEXES
-    pro topic-loop --name=Buffer_cache
